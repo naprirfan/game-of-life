@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game of life</title>
+	<style type="text/css">
+		#myCanvas {background-color: #000;}
+	</style>
+</head>
+<body>
+	<button onclick="start()">Start!</button><br /><br />
+	<canvas id="myCanvas" width="700" height="700" style="border:1px solid #000000;"></canvas>
+	<h1>The rules</h1>
+	<p>
+		<b>For a space that is 'populated':</b><br />
+		Each cell with one or no neighbors dies, as if by solitude.<br />
+		Each cell with four or more neighbors dies, as if by overpopulation.<br />
+		Each cell with two or three neighbors survives.<br /><br />
+		<b>For a space that is 'empty' or 'unpopulated'</b><br />
+		Each cell with three neighbors becomes populated.<br />
+	</p>
+	
+	<script type="text/javascript">
+		var c = document.getElementById("myCanvas");
+		var context = c.getContext("2d");
+		var map = [];
+		var percentDensity = 0.05;
+
+		//draw grid
+		function init () {
+			for (var x = 0; x < c.width; x += 10) {
+			  context.moveTo(x, 0);
+			  context.lineTo(x, c.height);
+			}
+
+			for (var y = 0; y < c.height; y += 10) {
+			  context.moveTo(0, y);
+			  context.lineTo(c.width, y);
+			}
+
+			context.moveTo(0,0);
+
+			context.strokeStyle = "#FFF";
+			context.stroke();	
+		}
+
+		function spawnCells() {
+			for (var x = 0; x < c.width; x+= 10) {
+				var tmp = [];
+				for (var y = 0; y < c.height; y+= 10) {
+					var number = Math.random();
+					number = number < percentDensity ? 1 : 0;
+
+					//draw green rect
+					if (number == 1) {
+						context.fillStyle = "#0F0";
+						context.fillRect(x,y,8,8);
+					}
+					tmp.push(number);
+				}
+				map.push(tmp);
+			}
+		}
+
+		function start () {
+			spawnCells();
+
+			window.setInterval(function(){
+				for (var x = 0; x < map.length; x++) {
+					for (var y = 0; y < map[x].length; y++) {
+						processCell(map[x][y], x, y);
+					};
+				};
+
+			}, 200);
+		}
+
+		//state = 0 (unpopulated), state = 1 (populated)
+		function processCell (state, x, y) {
+			var neighbors = get8Neighbors(x,y);
+			//console.log(neighbors);
+			if (state === 0) {
+				if (neighbors.populated === 3) {
+					//reproduction
+					map[x][y] = 1;
+					//draw green rect
+					context.fillStyle = "#0F0";
+					context.fillRect(x*10,y*10,8,8);
+				}
+			} else {
+				if (neighbors.populated <= 1 || neighbors.populated >= 4) {
+					//die
+					map[x][y] = 0;
+					//draw black rect
+					context.fillStyle = "#000";
+					context.fillRect(x*10,y*10,8,8);
+				};
+			};
+		}
+
+		/*
+		
+		1    2   3
+		4  (x,y) 5
+        6    7   8
+
+		*/
+		function get8Neighbors (x,y) {
+			var populated = 0;
+			var unpopulated = 0;
+
+			//first neighbor
+			var xIndex = x-1;
+			xIndex = xIndex < 0 ? (map.length - 1) : xIndex;
+			var yIndex = y-1;
+			yIndex = yIndex < 0 ? (map[0].length - 1) : yIndex;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+
+			//second neighbor
+			yIndex = y-1;
+			yIndex = yIndex < 0 ? (map[0].length - 1) : yIndex;
+			xIndex = x;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+			
+			//third neighbor
+			xIndex = x+1;
+			xIndex = xIndex > (map.length - 1) ? 0 : xIndex;
+			yIndex = y-1;
+			yIndex = yIndex < 0 ? (map[0].length - 1) : yIndex;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+			
+			//fourth neighbor
+			xIndex = x-1;
+			xIndex = xIndex < 0 ? (map.length - 1) : xIndex;
+			yIndex = y;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+
+			//fifth neighbor
+			xIndex = x+1;
+			xIndex = xIndex > (map.length - 1) ? 0 : xIndex;
+			yIndex = y;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+
+			//sixth neighbor
+			xIndex = x-1;
+			xIndex = xIndex < 0 ? (map.length - 1) : xIndex;
+			yIndex = y+1;
+			yIndex = yIndex > (map[0].length - 1) ? 0 : yIndex;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+
+			//seventh neighbor
+			xIndex = x;
+			yIndex = y+1;
+			yIndex = yIndex > (map[0].length - 1) ? 0 : yIndex;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+			
+			//eighth neighbor
+			xIndex = x+1;
+			xIndex = xIndex > (map.length - 1) ? 0 : xIndex;
+			yIndex = y+1;
+			yIndex = yIndex > (map[0].length - 1) ? 0 : yIndex;
+			map[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
+			
+			return {"populated":populated, "unpopulated":unpopulated};
+		}
+
+		init();
+		
+	</script>
+</body>
+</html>
