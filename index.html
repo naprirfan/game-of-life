@@ -140,8 +140,13 @@
 			for (var i = 0; i < neighbourMap.length; i++) {
 				xIndex = x + neighbourMap[i][0];
 				yIndex = y + neighbourMap[i][1];
-				xIndex = xIndex < 0 ? (map.length - 1) : xIndex;
-				yIndex = yIndex < 0 ? (map[0].length - 1) : yIndex;
+				
+				xIndex = xIndex == -1 ? (map.length - 1) : xIndex;
+				xIndex = xIndex == map.length ? 0 : xIndex;
+
+				yIndex = yIndex == -1 ? (map[0].length - 1) : yIndex;
+				yIndex = yIndex == map[0].length ? 0 : yIndex;
+				
 				previousMap[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
 			};
 			
