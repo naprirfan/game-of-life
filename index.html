@@ -8,8 +8,8 @@
 </head>
 <body>
 	<a href="https://github.com/naprirfan/game-of-life"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
-	<input type="button" onclick="resetMap()" value="Reset">&nbsp;
-	<input type="button" id="togglePlayButton" onclick="togglePlay()" value="Start!"><br /><br />
+	<input type="button" onclick="gol.resetMap()" value="Reset">&nbsp;
+	<input type="button" id="togglePlayButton" onclick="gol.togglePlay()" value="Start!"><br /><br />
 	<canvas id="myCanvas" width="700" height="700" style="border:1px solid #000000;"></canvas>
 	<h1>The rules</h1>
 	<p>
@@ -21,140 +21,6 @@
 		Each cell with three neighbors becomes populated.<br />
 	</p>
 	
-	<script type="text/javascript">
-		var c = document.getElementById("myCanvas");
-		var context = c.getContext("2d");
-		var map = [];
-		var percentDensity = 0.2;
-		var previousMap = [];
-		var myInterval;
-		/*
-		1    2   3
-		4  (x,y) 5
-        6    7   8
-		*/
-		var neighbourMap = [[-1,-1], [0, -1], [1, -1], [-1,0], [1,0], [-1,1], [0,1], [1,1]];
-
-		//draw grid
-		function init () {
-			for (var x = 0; x < c.width; x += 10) {
-			  context.moveTo(x, 0);
-			  context.lineTo(x, c.height);
-			}
-
-			for (var y = 0; y < c.height; y += 10) {
-			  context.moveTo(0, y);
-			  context.lineTo(c.width, y);
-			}
-
-			context.moveTo(0,0);
-			context.strokeStyle = "#FFF";
-			context.stroke();	
-		}
-
-		function resetMap() {
-			document.getElementById("togglePlayButton").value = "Start!"
-			clearInterval(myInterval);
-			map = [];
-			for (var x = 0; x < c.width; x += 10) {
-				for (var y = 0; y < c.height; y += 10) {
-					context.fillStyle = "#000";
-					context.fillRect(x,y,8,8);
-				}
-			}
-		}
-
-		function spawnCells() {
-			for (var x = 0; x < c.width; x+= 10) {
-				var tmp = [];
-				for (var y = 0; y < c.height; y+= 10) {
-					var number = Math.random();
-					number = number < percentDensity ? 1 : 0;
-
-					//draw green rect
-					if (number == 1) {
-						context.fillStyle = "#0F0";
-						context.fillRect(x,y,8,8);
-					}
-					tmp.push(number);
-				}
-				map.push(tmp);
-			}
-		}
-
-		function togglePlay() {
-			if (document.getElementById("togglePlayButton").value == "Stop") {
-				document.getElementById("togglePlayButton").value = "Start!"
-				clearInterval(myInterval);
-			}
-			else {
-				document.getElementById("togglePlayButton").value = "Stop";
-				if (map.length == 0) {
-					spawnCells();	
-				};
-				myInterval = setInterval(function(){
-					//duplicating array by slice(). This should be done to prevent duplicating array by Reference
-					for (var i = 0; i < map.length; i++)
-		    			previousMap[i] = map[i].slice();
-
-					for (var x = 0; x < map.length; x++) {
-						for (var y = 0; y < map[x].length; y++) {
-							processCell(x, y);
-						};
-					};
-				}, 200);
-			}
-		}
-
-		//state = 0 (unpopulated), state = 1 (populated)
-		function processCell (x, y) {
-			var state = previousMap[x][y];
-			var neighbors = get8Neighbors(x,y);
-			
-			if (state == 0) {
-				if (neighbors.populated == 3) {
-					//reproduction
-					map[x][y] = 1;
-					//draw green rect
-					context.fillStyle = "#0F0";
-					context.fillRect(x*10,y*10,8,8);
-				}
-			} else {
-				if (neighbors.populated <= 1 || neighbors.populated >= 4) {
-					//die due to solitary or overpopulation
-					map[x][y] = 0;
-					// //draw black rect
-					context.fillStyle = "#000";
-					context.fillRect(x*10,y*10,8,8);
-				} 
-			};
-		}
-
-		function get8Neighbors (x,y) {
-			var populated = 0;
-			var unpopulated = 0;
-
-			var xIndex;
-			var yIndex;
-
-			for (var i = 0; i < neighbourMap.length; i++) {
-				xIndex = x + neighbourMap[i][0];
-				yIndex = y + neighbourMap[i][1];
-				
-				xIndex = xIndex == -1 ? (map.length - 1) : xIndex;
-				xIndex = xIndex == map.length ? 0 : xIndex;
-
-				yIndex = yIndex == -1 ? (map[0].length - 1) : yIndex;
-				yIndex = yIndex == map[0].length ? 0 : yIndex;
-				
-				previousMap[xIndex][yIndex] == 0 ? unpopulated++ : populated++;
-			};
-			
-			return {"populated":populated, "unpopulated":unpopulated};
-		}
-
-		init();
-		
-	</script>
+	<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>
